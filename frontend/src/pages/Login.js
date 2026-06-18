@@ -1,71 +1,36 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
-
 function Login() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-
     try {
-      const response = await authAPI.login(formData);
-      const { token, user } = response.data;
-
-      // Save token and user
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      // Redirect based on role
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
+      const response = await authAPI.login({ email, password });
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      setError('Login failed');
     }
   };
-
   return (
-    <div className="py-5">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-5">
-            <div className="card-custom">
-              <div className="card-header text-center">
-                <h3>Login to School Facility Portal</h3>
-              </div>
-              <div className="card-body p-4">
-                {error && <div className="alert alert-danger">{error}</div>}
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-3">
-                    <label className="form-label">Email</label>
-                    <input type="email" name="email" className="form-control" value={formData.email} onChange={handleChange} required />
-                  </div>
-                  <div className="mb-4">
-                    <label className="form-label">Password</label>
-                    <input type="password" name="password" className="form-control" value={formData.password} onChange={handleChange} required />
-                  </div>
-                  <button type="submit" className="btn btn-custom w-100" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                  </button>
-                </form>
-                <p className="text-center mt-3">
-                  <a href="/register" className="text-primary">Create Account</a>
-                </p>
-              </div>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-header"><h3>Login</h3></div>
+            <div className="card-body">
+              {error && <div className="alert alert-danger">{error}</div>}
+              <form onSubmit={handleSubmit}>
+                <div className="mb-3"><label>Email</label><input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
+                <div className="mb-3"><label>Password</label><input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+                <button type="submit" className="btn btn-primary">Login</button>
+              </form>
+              <p className="mt-3"><Link to="/register">Register</Link></p>
             </div>
           </div>
         </div>
@@ -73,5 +38,4 @@ function Login() {
     </div>
   );
 }
-
 export default Login;
