@@ -1,0 +1,16 @@
+{
+  "name": "school-facility-portal",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "seed": "npm run seed --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.3"
+  },
+  "dependencies": {
+    "axios": "^1.18.1",
+    "react-router-dom": "^7.18.0"
+  }
+}
